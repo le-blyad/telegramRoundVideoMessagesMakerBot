@@ -1,16 +1,21 @@
-# This is a sample Python script.
+import telebot
+from bot_token import token
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+bot = telebot.TeleBot(token)
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+@bot.message_handler(commands = ['start'])
+def start(message):
+  bot.send_message(message.chat.id, '❗️ Привет, отправь видео')
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
+@bot.message_handler(content_types=['video'])
+def send_text(message):
+    file_info = bot.get_file(message.video.file_id)
+    downloaded_file = bot.download_file(file_info.file_path)
+    with open('video.mp4', 'wb') as video:
+        video.write(downloaded_file)
+    bot.send_video_note(message.chat.id, open('video.mp4', 'rb'))
+
+
+bot.polling(none_stop=True)
